@@ -27,14 +27,27 @@ const server = http.createServer((req, res) => {
         });
         // the following code section will be executed
         // after all the chunks is read
-        req.on('end', () => {
+        return req.on('end', () => {
                               // it will create a new Buffer and concat all the contents of body or chunks to the Buffer
                               // by calling toString() we are converting the contents of the Buffer into a string
             const parsedBody = Buffer.concat(body).toString();
             console.log(parsedBody);
             const message = parsedBody.split('=')[1];
-            // the following code will execute after Code Section-B
-            fs.writeFileSync('message.txt', message);
+            // here we use writeFileSync
+            // it will block execution of code
+            // it will be blocked untill the file
+            // is written
+            // fs.writeFileSync('message.txt', message);
+
+            // the following code is asynchronous code
+            // callback function will be called after
+            // we have written into the file
+            fs.writeFile('message.txt', message, (err) => {
+                res.statusCode = 302;   // redirect code
+                res.setHeader('Location', '/'); // Location is the default header accepted by the browser and we set it to '/'
+                console.log('Inside End');
+                return res.end();
+            });
         });
         
         // Code Section-B
